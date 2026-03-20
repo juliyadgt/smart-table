@@ -24,7 +24,7 @@ function collectState() {
     const rowsPerPage = parseInt(state.rowsPerPage);    // приведём количество страниц к числу
     const page = parseInt(state.page ?? 1);             // номер страницы по умолчанию 1 и тоже число
 
-    return {                                            // расширьте существующий return вот так
+    return {                                            
         ...state,
         rowsPerPage,
         page
@@ -40,9 +40,9 @@ function render(action) {
     let result = [...data]; // копируем для последующего изменения
     // @todo: использование
     result = searching(result, state, action);   // поиск
-    result = applyPagination(result, state, action);   // фильтрация
+    result = applyFiltering(result, state, action);  // фильтрация  
     result = applySorting(result, state, action);     // сортировка
-    result = applyFiltering(result, state, action);  // пагинация
+    result = applyPagination(result, state, action); // пагинация
 
     sampleTable.render(result)
 }
@@ -57,6 +57,15 @@ const sampleTable = initTable({
 // @todo: инициализация
 const searching = initSearching('search');
 
+const applyFiltering = initFiltering(sampleTable.filter.elements, {    
+    searchBySeller: indexes.sellers                                    
+});
+
+const applySorting = initSorting([        
+    sampleTable.header.elements.sortByDate,
+    sampleTable.header.elements.sortByTotal
+]);
+
 const applyPagination = initPagination(
     sampleTable.pagination.elements,             
     (el, page, isCurrent) => {                    
@@ -68,15 +77,6 @@ const applyPagination = initPagination(
         return el;
     }
 );
-
-const applySorting = initSorting([        
-    sampleTable.header.elements.sortByDate,
-    sampleTable.header.elements.sortByTotal
-]);
-
-const applyFiltering = initFiltering(sampleTable.filter.elements, {    
-    searchBySeller: indexes.sellers                                    
-});
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
