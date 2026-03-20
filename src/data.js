@@ -1,4 +1,4 @@
-import {makeIndex} from "./lib/utils.js";
+import { makeIndex } from "./lib/utils.js";
 
 export function initData(sourceData) {
     const sellers = makeIndex(sourceData.sellers, 'id', v => `${v.first_name} ${v.last_name}`);
@@ -10,5 +10,5 @@ export function initData(sourceData) {
         customer: customers[item.customer_id],
         total: item.total_amount
     }));
-    return {sellers, customers, data};
+    return { sellers, customers, data };
 }
