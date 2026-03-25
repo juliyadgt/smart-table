@@ -1,48 +1,57 @@
-import { createComparison, defaultRules } from "../lib/compare.js";
+export function initFiltering(elements) {
 
-// @todo: #4.3 — настроить компаратор
-const compareFn = createComparison([
-    'skipNonExistentSourceFields',
-    'skipEmptyTargetValues',
-    'arrayAsRange',
-    'caseInsensitiveStringIncludes'
-]);
-
-export function initFiltering(elements, indexes) {
-    // @todo: #4.1 — заполнить выпадающие списки опциями
-    Object.keys(indexes)
-        .forEach((elementName) => {
+    // Заполняю список полями с сервера
+    const updateIndexes = (elements, indexes) => {
+        Object.keys(indexes).forEach((elementName) => {
             elements[elementName].append(
-                ...Object.values(indexes[elementName])
-                    .map(name => {
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name;
-                        return option;
-                    })
-            )
+                ...Object.values(indexes[elementName]).map(name => {
+                    const el = document.createElement('option');
+                    el.textContent = name;
+                    el.value = name;
+                    return el;
+                })
+            );
         });
+    };
 
-    return (data, state, action) => {
-        // @todo: #4.2 — обработать очистку поля
+    // Формирую фильтрацию для запроса на сервер
+    const applyFiltering = (query, state, action) => {
+
+        // обработка очистки поля
         if (action && action.name === 'clear') {
             const field = action.dataset.field;
             const parent = action.closest('[data-filter]');
             const input = parent.querySelector(`[name="${field}"]`);
-
             if (input) input.value = '';
         }
 
-        const min = state.totalFrom ? parseFloat(state.totalFrom) : 0;
-        const max = state.totalTo ? parseFloat(state.totalTo) : Infinity;
+        // формирую объект из элементов фильтра
+        const filter = {};
 
-        const filterState = {
-            ...state,
-            total: [min, max]
-        };
+        Object.keys(elements).forEach(key => {
+            const el = elements[key];
 
-        // @todo: #4.5 — отфильтровать данные используя компаратор
-        const filtered = data.filter(item => compareFn(item, filterState));
-        return filtered;
+            if (!el) return;
+
+            // ищу поле с непустым значением
+            if (['INPUT', 'SELECT'].includes(el.tagName) && el.value) {
+                filter[`filter[${el.name}]`] = el.value;
+            }
+        });
+
+        // обработка, если фильтр пуст
+        if (!Object.keys(filter).length) {
+            return query;
+        }
+
+        // добавляю параметры фильтрации
+        return Object.assign({}, query, filter);
+    };
+
+    return {
+        updateIndexes,
+        applyFiltering
     };
 }
+
+

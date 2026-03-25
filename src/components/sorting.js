@@ -1,7 +1,7 @@
-import { sortCollection, sortMap } from "../lib/sort.js";
+// import { sortMap } from "../lib/sort.js"; - не нужен
 
 export function initSorting(columns) {
-    return (data, state, action) => {
+    return (query, state, action) => {
         let field = null;
         let order = null;
 
@@ -11,6 +11,7 @@ export function initSorting(columns) {
             field = action.dataset.field;
             order = action.dataset.value;
 
+            // сбрасываю сортировку у остальных колонок
             columns.forEach(column => {
                 if (column.dataset.field !== action.dataset.field) {
                     column.dataset.value = 'none';
@@ -18,7 +19,7 @@ export function initSorting(columns) {
             });
         }
 
-        // @todo: #3.3 — применить выбранный режим сортировки при последующих перерисовках
+        // применяю сортировку, если она уже выбрана
         columns.forEach(column => {
             if (column.dataset.value !== 'none') {
                 field = column.dataset.field;
@@ -26,6 +27,17 @@ export function initSorting(columns) {
             }
         });
 
-        return sortCollection(data, field, order);
-    }
+        // формирую параметр сортировки
+        const sort = (field && order !== 'none') // сохраним в переменную параметр сортировки в виде field:direction
+            ? `${field}:${order}`
+            : null;     
+
+        // если сортировка есть, добавляю в query
+        return sort
+            ? Object.assign({}, query, { sort })
+            : query;  
+    };
 }
+
+//тут я переделала логику сортировки, убрав компаратор, теперь все с сервера
+
