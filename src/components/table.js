@@ -22,18 +22,18 @@ export function initTable(settings, onAction) {
 
     // @todo: #1.2 —  вывести дополнительные шаблоны до и после таблицы
     //создаем список искомых id 
-    const BfrListId = ['search', 'header', 'filter'];
-    const AftListId = ['pagination'];
+    const beforeListId = ['search', 'header', 'filter'];
+    const afterListId = ['pagination'];
 
     // Добавляем в массив рально существующие id по которым будем работать
-    BfrListId.forEach(id => {
+    beforeListId.forEach(id => {
         const template = document.getElementById(id);
         if (template) {
             before.push(id);
         }
     });
 
-    AftListId.forEach(id => {
+    afterListId.forEach(id => {
         const template = document.getElementById(id);
         if (template) {
             after.push(id);
@@ -53,7 +53,7 @@ export function initTable(settings, onAction) {
     });
 
     // @todo: #1.3 —  обработать события и вызвать onAction()
-    root.container.addEventListener('change', function () { onAction() });
+    root.container.addEventListener('change', onAction);
     root.container.addEventListener('reset', function () { setTimeout(function () { onAction(); }); });
     root.container.addEventListener('submit', function (e) { e.preventDefault(); onAction(e.submitter); });
 

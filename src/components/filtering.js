@@ -20,7 +20,7 @@ export function initFiltering(elements) {
         // обработка очистки поля
         if (action && action.name === 'clear') {
             const field = action.dataset.field;
-            const parent = action.closest('[data-filter]');
+            const parent = action.closest('[data-name="filter"]');
             const input = parent.querySelector(`[name="${field}"]`);
             if (input) input.value = '';
         }
